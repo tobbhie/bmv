@@ -7,6 +7,8 @@ import { Telegraf, Markup } from 'telegraf';
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const SECRET_CODE = process.env.SECRET_CODE;
 const GIF_URL = process.env.GIF_URL || 'https://media.tenor.com/images/3421945902795778238/tenor.gif';
+const WEBHOOK_DOMAIN = process.env.WEBHOOK_DOMAIN;
+const PORT = process.env.PORT || 3000;
 
 if (!BOT_TOKEN) {
     console.error('❌ BOT_TOKEN is required! Create a .env file with your bot token.');
@@ -148,11 +150,23 @@ bot.action('no_valentine', async (ctx) => {
 });
 
 // ═══════════════════════════════════════════════════════════════
-// Launch Bot
+// Launch Bot (Webhook Mode)
 // ═══════════════════════════════════════════════════════════════
-bot.launch()
+if (!WEBHOOK_DOMAIN) {
+    console.error('❌ WEBHOOK_DOMAIN is required! Add it to your .env file.');
+    process.exit(1);
+}
+
+bot.launch({
+    webhook: {
+        domain: WEBHOOK_DOMAIN,
+        port: PORT
+    }
+})
     .then(() => {
-        console.log('Valentine Bot is running!');
+        console.log(`Valentine Bot is running in webhook mode!`);
+        console.log(`Webhook URL: ${WEBHOOK_DOMAIN}`);
+        console.log(`Listening on port: ${PORT}`);
         console.log('Waiting for your special someone...');
     })
     .catch((err) => {
